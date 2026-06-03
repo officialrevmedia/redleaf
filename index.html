@@ -225,8 +225,6 @@ section{position:relative}
 .pcard .prow{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
 .pcard .price{font-family:var(--display);font-size:24px;font-weight:600;letter-spacing:-.01em}
 .pcard .price small{font-size:12px;color:var(--steel);font-weight:500;font-family:var(--sans);display:block;letter-spacing:.02em}
-.pcard .buybtn{margin-top:14px}
-.pcard .buybtn:empty{display:none}
 @media(max-width:980px){.prods{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:620px){.prods{grid-template-columns:1fr}}
 
@@ -625,6 +623,45 @@ section{position:relative}
   .pdp-info h1{font-size:28px}
   .pdp-price{font-size:30px}
 }
+
+/* ===== Inquiry modal ===== */
+.inq-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-48%) scale(.97);width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 48px);overflow-y:auto;background:var(--white);border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.4);z-index:120;opacity:0;visibility:hidden;transition:opacity .3s var(--ease),transform .3s var(--ease),visibility .3s;padding:0}
+.inq-modal.open{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
+.inq-close{position:absolute;top:16px;right:16px;z-index:2;color:var(--steel)}
+.inq-close:hover{color:var(--ink)}
+.inq-inner{padding:42px 40px 36px}
+.inq-eyebrow{display:inline-block;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:12px}
+.inq-modal h3{font-family:var(--display);font-size:26px;font-weight:500;letter-spacing:-.02em;line-height:1.15;color:var(--ink);margin-bottom:10px;padding-right:30px}
+.inq-sub{font-size:14.5px;color:var(--steel);line-height:1.6;margin-bottom:22px}
+.inq-sub a{color:var(--red);font-weight:600;white-space:nowrap}
+.inq-product{display:flex;gap:16px;align-items:center;padding:14px;background:var(--paper);border:1px solid var(--line);border-radius:7px;margin-bottom:22px}
+.inq-product img{width:64px;height:64px;object-fit:cover;border-radius:5px;flex-shrink:0}
+.inq-product span{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);font-weight:600;margin-bottom:3px}
+.inq-product strong{display:block;font-size:15px;color:var(--ink);font-weight:700;line-height:1.2;margin-bottom:2px}
+.inq-product em{font-size:13px;color:var(--red-deep);font-style:normal;font-weight:700}
+.inq-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.inq-modal label{display:block;font-size:12.5px;font-weight:700;color:var(--charcoal);letter-spacing:.01em}
+.inq-modal label span{color:var(--red)}
+.inq-modal label.inq-full{margin-bottom:18px}
+.inq-modal input,.inq-modal select,.inq-modal textarea{width:100%;margin-top:6px;padding:11px 13px;border:1px solid var(--line);border-radius:5px;font-family:inherit;font-size:14px;font-weight:400;color:var(--ink);background:var(--white);transition:border-color .2s}
+.inq-modal input:focus,.inq-modal select:focus,.inq-modal textarea:focus{outline:none;border-color:var(--red)}
+.inq-modal textarea{resize:vertical;min-height:90px}
+.inq-fineprint{font-size:11.5px;color:var(--steel);text-align:center;margin-top:14px;line-height:1.4}
+/* success state */
+.inq-success{display:none;padding:52px 40px 44px;text-align:center}
+.inq-success.show{display:block}
+.inq-check{width:64px;height:64px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;margin:0 auto 22px}
+.inq-check svg{width:30px;height:30px;stroke:#fff}
+.inq-success h3{font-family:var(--display);font-size:26px;font-weight:500;margin-bottom:12px}
+.inq-success p{font-size:14.5px;color:var(--steel);line-height:1.65;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto}
+.inq-success p a{color:var(--red);font-weight:600;white-space:nowrap}
+@media(max-width:560px){
+  .inq-inner{padding:34px 22px 28px}
+  .inq-row{grid-template-columns:1fr;gap:0}
+  .inq-row label{margin-bottom:14px}
+  .inq-modal h3{font-size:22px}
+  .inq-success{padding:42px 22px 32px}
+}
 </style>
 </head>
 <body>
@@ -650,8 +687,8 @@ section{position:relative}
     </a>
     <nav class="nav" aria-label="Primary">
       <a href="#" data-page="home" onclick="goPage('home','categories');return false">Shop</a>
-      <a href="https://redleafequipment.com/collections/all">Storage Sheds</a>
-      <a href="https://redleafequipment.com/collections/all">Cabinets</a>
+      <a href="#" onclick="goPage('home','bestsellers');filterCat('Metal Sheds');return false">Metal Sheds</a>
+      <a href="#" onclick="goPage('home','bestsellers');filterCat('Outdoor Cabinets');return false">Cabinets</a>
       <a href="#" data-page="wholesale" onclick="goPage('wholesale');return false">Wholesale</a>
       <a href="#" data-page="faq" onclick="goPage('faq');return false">Shipping &amp; FAQ</a>
       <a href="#" data-page="about" onclick="goPage('about');return false">About</a>
@@ -659,9 +696,7 @@ section{position:relative}
     </nav>
     <div class="head-actions">
       <button class="icon-btn" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
-      <a href="https://redleafequipment.com/account" class="icon-btn" aria-label="Account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg></a>
-      <button class="icon-btn" aria-label="Cart" onclick="openCart()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="cart-count" id="cc">0</span></button>
-      <a href="https://redleafequipment.com/collections/all" class="btn btn-red btn-sm">Shop Now</a>
+      <button class="btn btn-red btn-sm" onclick="openInquiry()">Inquire Now</button>
       <button class="icon-btn burger" aria-label="Menu" onclick="openMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
     </div>
   </div>
@@ -680,8 +715,8 @@ section{position:relative}
     <h1 class="reveal" data-d="1">Built to <em>Endure.</em></h1>
     <p class="reveal" data-d="2">Affordable, durable storage built for Canadian homes. Locally owned in Ontario. Free delivery across Canada.</p>
     <div class="hero-cta reveal" data-d="3">
-      <a href="https://redleafequipment.com/collections/all" class="btn btn-red">Shop Storage Solutions <span class="arr">&rarr;</span></a>
-      <a href="#bestsellers" class="btn btn-ghost">View Bestsellers</a>
+      <a href="#" onclick="goPage('home','bestsellers');return false" class="btn btn-red">View Our Products <span class="arr">&rarr;</span></a>
+      <a href="#" onclick="openInquiry()" class="btn btn-ghost">Inquire Now</a>
     </div>
     <div class="hero-meta reveal" data-d="4">
       <div class="m"><b>Locally</b><span>Ontario Owned</span></div>
@@ -890,8 +925,8 @@ section{position:relative}
     <div class="box reveal">
       <h2>Upgrade your storage with equipment built to last.</h2>
       <div class="fc">
-        <a href="https://redleafequipment.com/collections/all" class="btn btn-red">Shop Now <span class="arr">&rarr;</span></a>
-        <a href="#" onclick="goPage('contact');return false" class="btn btn-ghost">Contact Us</a>
+        <a href="#" onclick="goPage('home','bestsellers');return false" class="btn btn-red">View Our Products <span class="arr">&rarr;</span></a>
+        <a href="#" onclick="openInquiry()" class="btn btn-ghost">Inquire Now</a>
       </div>
     </div>
   </div>
@@ -926,7 +961,7 @@ section{position:relative}
         <div class="reveal" data-d="1">
           <span class="eyebrow">Our Story</span>
           <h2>Started small. Stayed honest.</h2>
-          <p>Red Leaf Equipment is based in Kitchener-Waterloo and run by Halim Sakhi. We focus on a tight lineup — three product types, six sizes — so we can actually stand behind what we sell.</p>
+          <p>Red Leaf Equipment is based in Kitchener-Waterloo and locally owned and operated. We focus on a tight lineup — three product types, six sizes — so we can actually stand behind what we sell.</p>
           <p>Most Canadians value their homes. Whether you own a house, manage a rental, or just want your backyard to look like yours again, the right storage makes a difference. Our job is to make that storage affordable and dependable, without the box-store experience.</p>
           <p>We ship across Canada, offer free local pickup in Kitchener-Waterloo, and answer the phone when you call. That's the brand.</p>
         </div>
@@ -980,8 +1015,8 @@ section{position:relative}
       <div class="box reveal">
         <h2>Storage built the way it should be.</h2>
         <div class="fc">
-          <a href="https://redleafequipment.com/collections/all" class="btn btn-red">Shop Now <span class="arr">&rarr;</span></a>
-          <a href="#" onclick="goPage('contact');return false" class="btn btn-ghost">Contact Us</a>
+          <a href="#" onclick="goPage('home','bestsellers');return false" class="btn btn-red">View Our Products <span class="arr">&rarr;</span></a>
+          <a href="#" onclick="openInquiry()" class="btn btn-ghost">Inquire Now</a>
         </div>
       </div>
     </div>
@@ -1006,7 +1041,7 @@ section{position:relative}
         <div class="contact-info reveal">
           <span class="eyebrow">Get in Touch</span>
           <h2>We answer the phone.</h2>
-          <p>Whether you're choosing between sizes, tracking an order, or arranging local pickup in Kitchener-Waterloo, just reach out. Halim or someone on the team will get back to you the same day, most of the time.</p>
+          <p>Whether you're choosing between sizes, asking about a product, or arranging local pickup in Kitchener-Waterloo, just reach out. Someone on our team will get back to you the same day, most of the time.</p>
           <div class="cinfo-row">
             <div class="ic"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92Z"/></svg></div>
             <div><h4>Phone</h4><a href="tel:5195726483">519-572-6483</a></div>
@@ -1313,45 +1348,60 @@ section{position:relative}
 
 <!-- mobile sticky cta -->
 <div class="mobile-cta">
-  <a href="https://redleafequipment.com/collections/all" class="btn btn-red btn-sm">Shop Now</a>
-  <button class="btn btn-line btn-sm" onclick="openCart()">View Cart</button>
+  <a href="#" onclick="goPage('home','bestsellers');return false" class="btn btn-line btn-sm">View Products</a>
+  <button class="btn btn-red btn-sm" onclick="openInquiry()">Inquire Now</button>
 </div>
 
-<!-- cart drawer -->
+<!-- inquiry modal -->
 <div class="overlay" id="overlay" onclick="closeAll()"></div>
-<aside class="drawer" id="drawer" aria-label="Shopping cart">
-  <div class="drawer-head"><h3>Your Cart</h3><button class="icon-btn" onclick="closeAll()" aria-label="Close cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
-  <div class="drawer-body" id="cartBody"><div class="drawer-empty">Your cart is empty.</div></div>
-  <div class="drawer-foot"><div class="tot"><span>Subtotal</span><span id="subtotal">$0.00</span></div><a href="https://redleafequipment.com/collections/all" class="btn btn-dark">Checkout</a><div class="note">Secure checkout. Free shipping across Canada.</div></div>
+<aside class="inq-modal" id="inqModal" aria-label="Product inquiry" role="dialog" aria-modal="true">
+  <button class="inq-close icon-btn" onclick="closeAll()" aria-label="Close inquiry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  <div class="inq-inner" id="inqInner">
+    <span class="inq-eyebrow">Inquire</span>
+    <h3 id="inqTitle">Send us an inquiry</h3>
+    <p class="inq-sub" id="inqSub">Tell us what you need and we'll get back to you within one business day. Or call <a href="tel:5195726483">519-572-6483</a>.</p>
+    <div class="inq-product" id="inqProduct" style="display:none">
+      <img id="inqProductImg" src="" alt="">
+      <div><span>Inquiring about</span><strong id="inqProductName"></strong><em id="inqProductPrice"></em></div>
+    </div>
+    <form id="inqForm" onsubmit="return submitInquiry(event)">
+      <div class="inq-row">
+        <label>Name <span>*</span><input type="text" name="name" required></label>
+        <label>Email <span>*</span><input type="email" name="email" required></label>
+      </div>
+      <div class="inq-row">
+        <label>Phone<input type="tel" name="phone"></label>
+        <label>Preferred contact
+          <select name="contactpref"><option>Email</option><option>Phone</option><option>Either</option></select>
+        </label>
+      </div>
+      <label class="inq-full">Message <span>*</span><textarea name="message" rows="4" required></textarea></label>
+      <button type="submit" class="btn btn-red" style="width:100%;justify-content:center;height:50px">Send Inquiry <span class="arr">&rarr;</span></button>
+      <p class="inq-fineprint">We'll never share your information. Expect a reply within one business day.</p>
+    </form>
+  </div>
+  <div class="inq-success" id="inqSuccess">
+    <div class="inq-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h3>Inquiry sent.</h3>
+    <p>Thanks for reaching out. Someone on our team will get back to you within one business day. Need a faster answer? Call <a href="tel:5195726483">519-572-6483</a>, 9am to 11pm, 7 days a week.</p>
+    <button class="btn btn-dark" onclick="closeAll()" style="justify-content:center">Done</button>
+  </div>
 </aside>
 
 <!-- mobile menu -->
 <div class="mmenu" id="mmenu">
   <button class="mclose icon-btn" onclick="closeAll()" aria-label="Close menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-  <a href="#" onclick="goPage('home','categories');closeAll();return false">Shop</a>
-  <a href="https://redleafequipment.com/collections/all">Storage Sheds</a>
-  <a href="https://redleafequipment.com/collections/all">Cabinets</a>
+  <a href="#" onclick="goPage('home','bestsellers');closeAll();return false">Shop</a>
+  <a href="#" onclick="goPage('home','bestsellers');filterCat('Metal Sheds');closeAll();return false">Metal Sheds</a>
+  <a href="#" onclick="goPage('home','bestsellers');filterCat('Outdoor Cabinets');closeAll();return false">Cabinets</a>
   <a href="#" onclick="goPage('wholesale');closeAll();return false">Wholesale</a>
   <a href="#" onclick="goPage('faq');closeAll();return false">Shipping &amp; FAQ</a>
   <a href="#" onclick="goPage('about');closeAll();return false">About</a>
   <a href="#" onclick="goPage('contact');closeAll();return false">Contact</a>
-  <a href="https://redleafequipment.com/collections/all" class="btn btn-red">Shop Now</a>
+  <button class="btn btn-red" onclick="closeAll();openInquiry()">Inquire Now</button>
 </div>
 
 <script>
-/* ============================================================
-   SHOPIFY BUY BUTTON CONFIG  —  EDIT THIS BLOCK ONLY
-   ------------------------------------------------------------
-   1. Set SHOPIFY_DOMAIN to your store (e.g. "redleafequipment.myshopify.com")
-   2. Set STOREFRONT_TOKEN (Storefront API access token from your Sales Channel)
-   3. Paste each product's numeric ID into the matching "shopifyId" below.
-   When SHOPIFY_DOMAIN is filled in, real Shopify Buy Buttons + checkout load.
-   While it's blank, the page runs in DEMO mode with the preview cart.
-   ============================================================ */
-const SHOPIFY_DOMAIN   = "";   // <-- your-store.myshopify.com
-const STOREFRONT_TOKEN = "";   // <-- Storefront API access token
-const SHOPIFY_READY = SHOPIFY_DOMAIN && STOREFRONT_TOKEN;
-
 /* ---- Red Leaf Equipment product catalog ---- */
 const PRODUCTS=[
   {
@@ -1594,7 +1644,7 @@ document.getElementById('prodGrid').innerHTML=PRODUCTS.map(p=>`
     <div class="ph">
       ${p.badge?`<span class="badge">${p.badge}</span>`:''}
       <a href="#" onclick="goProduct(${p.id});return false" aria-label="View ${p.name}"><img src="${p.img}" alt="${p.name}" loading="lazy"></a>
-      <button class="quick" onclick="addToCart(${p.id})">Quick Add &nbsp;+</button>
+      <button class="quick" onclick="openInquiry(${p.id})">Inquire &nbsp;&rarr;</button>
     </div>
     <div class="pb">
       <div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
@@ -1604,34 +1654,50 @@ document.getElementById('prodGrid').innerHTML=PRODUCTS.map(p=>`
         <div class="price"><small>Starting at</small>${money(p.price)}</div>
         <a href="#" onclick="goProduct(${p.id});return false" class="btn btn-line btn-sm">View Product</a>
       </div>
-      <div class="buybtn" id="buybtn-${p.id}"></div>
     </div>
   </article>`).join('');
 
 /* ---- cart ---- */
-let cart=[];
-function addToCart(id){
-  const p=PRODUCTS.find(x=>x.id===id);
-  const e=cart.find(x=>x.id===id);
-  if(e)e.qty++;else cart.push({...p,qty:1});
-  renderCart();openCart();
+/* ---- inquiry modal (replaces cart) ---- */
+function openInquiry(id){
+  const modal=document.getElementById('inqModal');
+  const prod=document.getElementById('inqProduct');
+  const form=document.getElementById('inqForm');
+  const success=document.getElementById('inqSuccess');
+  const inner=document.getElementById('inqInner');
+  // reset to form view
+  form.style.display='';inner.style.display='';success.classList.remove('show');
+  form.reset();
+  if(id!==undefined && id!==null){
+    const p=PRODUCTS.find(x=>x.id===Number(id));
+    if(p){
+      document.getElementById('inqProductImg').src=p.img;
+      document.getElementById('inqProductImg').alt=p.name;
+      document.getElementById('inqProductName').textContent=p.name;
+      document.getElementById('inqProductPrice').textContent=money(p.price)+' CAD';
+      document.getElementById('inqTitle').textContent='Inquire about the '+p.name;
+      document.getElementById('inqSub').innerHTML="We'll get back to you within one business day with availability, delivery options, and any questions you have. Or call <a href=\"tel:5195726483\">519-572-6483</a>.";
+      prod.style.display='';
+      form.querySelector('[name=message]').value="I'd like more information about the "+p.name+". Please let me know about availability and delivery to my area.";
+    }
+  } else {
+    prod.style.display='none';
+    document.getElementById('inqTitle').textContent='Send us an inquiry';
+    document.getElementById('inqSub').innerHTML="Tell us what you need and we'll get back to you within one business day. Or call <a href=\"tel:5195726483\">519-572-6483</a>.";
+    form.querySelector('[name=message]').value='';
+  }
+  document.getElementById('overlay').classList.add('open');
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
 }
-function removeItem(id){cart=cart.filter(x=>x.id!==id);renderCart();}
-function renderCart(){
-  const n=cart.reduce((s,x)=>s+x.qty,0);
-  const cc=document.getElementById('cc');
-  cc.textContent=n;cc.classList.toggle('show',n>0);
-  const body=document.getElementById('cartBody');
-  if(!cart.length){body.innerHTML='<div class="drawer-empty">Your cart is empty.</div>';}
-  else{body.innerHTML=cart.map(x=>`
-    <div class="ci"><img src="${x.img}" alt="${x.name}">
-      <div class="cinf"><h4>${x.name}</h4><div class="cp">${money(x.price)} × ${x.qty}</div>
-      <div class="rm" onclick="removeItem(${x.id})" style="cursor:pointer">Remove</div></div></div>`).join('');}
-  document.getElementById('subtotal').textContent=money(cart.reduce((s,x)=>s+x.price*x.qty,0));
+function submitInquiry(e){
+  e.preventDefault();
+  document.getElementById('inqInner').style.display='none';
+  document.getElementById('inqSuccess').classList.add('show');
+  return false;
 }
-function openCart(){document.getElementById('overlay').classList.add('open');document.getElementById('drawer').classList.add('open');document.body.style.overflow='hidden';}
 function openMenu(){document.getElementById('overlay').classList.add('open');document.getElementById('mmenu').classList.add('open');document.body.style.overflow='hidden';}
-function closeAll(){document.getElementById('overlay').classList.remove('open');document.getElementById('drawer').classList.remove('open');document.getElementById('mmenu').classList.remove('open');document.body.style.overflow='';}
+function closeAll(){document.getElementById('overlay').classList.remove('open');var m=document.getElementById('inqModal');if(m)m.classList.remove('open');document.getElementById('mmenu').classList.remove('open');document.body.style.overflow='';}
 function joinList(e){e.preventDefault();e.target.querySelector('input').value='';e.target.insertAdjacentHTML('afterend','<p style="margin-top:14px;font-size:14px;color:var(--red-bright);font-weight:600">Thanks — you\'re on the list.</p>');return false;}
 
 /* ---- scroll reveal ---- */
@@ -1708,7 +1774,7 @@ function renderProductPage(p){
       <div class="ph">
         ${r.badge?`<span class="badge">${r.badge}</span>`:''}
         <a href="#" onclick="goProduct(${r.id});return false"><img src="${r.img}" alt="${r.name}" loading="lazy"></a>
-        <button class="quick" onclick="addToCart(${r.id})">Quick Add &nbsp;+</button>
+        <button class="quick" onclick="openInquiry(${r.id})">Inquire &nbsp;&rarr;</button>
       </div>
       <div class="pb">
         <div class="tags">${r.tags.slice(0,3).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
@@ -1755,16 +1821,11 @@ function renderProductPage(p){
             </div>
 
             <div class="pdp-qty-row">
-              <div class="pdp-qty">
-                <button type="button" onclick="changeQty(-1)" aria-label="Decrease">−</button>
-                <input type="number" id="pdpQty" value="1" min="1" max="99">
-                <button type="button" onclick="changeQty(1)" aria-label="Increase">+</button>
-              </div>
-              <button class="btn btn-red pdp-addbtn" onclick="addToCartWithQty(${p.id})">Add to Cart <span class="arr">&rarr;</span></button>
+              <button class="btn btn-red pdp-addbtn" onclick="openInquiry(${p.id})">Inquire About This Product <span class="arr">&rarr;</span></button>
             </div>
             <div class="pdp-secondary">
               <a href="tel:5195726483" class="btn btn-ghost">Call 519-572-6483</a>
-              <a href="#" onclick="goPage('contact');return false" class="btn btn-ghost">Ask a Question</a>
+              <a href="#" onclick="openInquiry(${p.id})" class="btn btn-ghost">Ask a Question</a>
             </div>
 
             <div class="pdp-trust">
@@ -1839,18 +1900,7 @@ function swapPdpImage(btn, idx){
   btn.classList.add('active');
 }
 
-function changeQty(delta){
-  const inp = document.getElementById('pdpQty');
-  if(!inp) return;
-  let v = Math.max(1, Math.min(99, (Number(inp.value)||1) + delta));
-  inp.value = v;
-}
-
-function addToCartWithQty(id){
-  const inp = document.getElementById('pdpQty');
-  const qty = inp ? Math.max(1, Number(inp.value)||1) : 1;
-  for(let i = 0; i < qty; i++) addToCart(id);
-}
+/* quantity + cart helpers removed — inquiry-only model */
 
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
@@ -1897,58 +1947,7 @@ window.addEventListener('hashchange',routeFromHash);
 function submitContact(e){e.preventDefault();document.getElementById('contactOk').classList.add('show');e.target.querySelectorAll('input,textarea').forEach(f=>f.value='');return false;}
 function submitWholesale(e){e.preventDefault();document.getElementById('wholeOk').classList.add('show');e.target.querySelectorAll('input,textarea').forEach(f=>f.value='');return false;}
 
-/* ============================================================
-   SHOPIFY BUY BUTTON LOADER
-   Loads Shopify's SDK and mounts a real Buy Button into each
-   #buybtn-N when SHOPIFY_DOMAIN + STOREFRONT_TOKEN + shopifyId
-   are set. Otherwise the demo Quick Add / cart stays active.
-   ============================================================ */
-(function(){
-  if(!SHOPIFY_READY){
-    console.log('[Red Leaf] Demo mode — add SHOPIFY_DOMAIN & STOREFRONT_TOKEN to go live.');
-    return;
-  }
-  var SDK='https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
-  var s=document.createElement('script');s.async=true;s.src=SDK;
-  s.onload=initShopify;document.head.appendChild(s);
-
-  function initShopify(){
-    var client=ShopifyBuy.buildClient({domain:SHOPIFY_DOMAIN,storefrontAccessToken:STOREFRONT_TOKEN});
-    var ui=ShopifyBuy.UI.init(client);
-    PRODUCTS.forEach(function(p){
-      if(!p.shopifyId)return;
-      var node=document.getElementById('buybtn-'+p.id);
-      if(!node)return;
-      ui.createComponent('product',{
-        id:p.shopifyId,
-        node:node,
-        moneyFormat:'%24%7B%7Bamount%7D%7D',
-        options:{
-          product:{
-            iframe:false,                 /* inherit our page styling */
-            contents:{img:false,title:false,price:false}, /* card already shows these */
-            text:{button:'Add to Cart'},
-            styles:{button:{
-              'background-color':'#B11226','border-radius':'2px','font-family':'Archivo, sans-serif',
-              'font-weight':'600',':hover':{'background-color':'#8A0E1E'},
-              ':focus':{'background-color':'#8A0E1E'}
-            }}
-          },
-          cart:{
-            popup:false,
-            styles:{button:{'background-color':'#B11226',':hover':{'background-color':'#8A0E1E'}}},
-            text:{title:'Your Cart',button:'Checkout'}
-          },
-          toggle:{styles:{toggle:{'background-color':'#15171A',':hover':{'background-color':'#23262B'}}}}
-        }
-      });
-    });
-    /* when Shopify is live, hide the demo Quick Add buttons so there's one true cart */
-    document.querySelectorAll('.pcard .quick').forEach(function(b){b.style.display='none';});
-    document.querySelector('.mobile-cta .btn-line').setAttribute('onclick','');
-    console.log('[Red Leaf] Shopify Buy Buttons loaded.');
-  }
-})();
+/* Inquiry-only model — no ecommerce, no Shopify. */
 </script>
 </body>
 </html>
